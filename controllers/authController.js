@@ -20,7 +20,7 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    secure: true,
+    // secure: true,
     httpOnly: true
   };
 
@@ -31,7 +31,7 @@ const createSendToken = (user, statusCode, res) => {
   user.password = undefined;
 
   res.status(statusCode).json({
-    status: 'succes',
+    status: 'success',
     token,
     data: {
       user
@@ -64,7 +64,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // 1) Check if email and password exists
+  // 1) Check if email and password exist
   if (!email || !password) {
     return next(new AppError('Please provide email and password!', 400));
   }
@@ -93,7 +93,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   if (!token) {
     return next(
-      new AppError('You are not logged in! Please log in to get access,', 401)
+      new AppError('You are not logged in! Please log in to get access.', 401)
     );
   }
   // 2) Verification token
@@ -103,11 +103,11 @@ exports.protect = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return next(
-      new AppError('The user beloging to this token no longer exists', 401)
+      new AppError('The user belonging to this token no longer exists', 401)
     );
   }
 
-  // 4) Check if user changed password after the token issued.
+  // 4) Check if user changed password after the token was issued.
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password. Please log in again.', 401)
@@ -135,10 +135,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError('There is no user with that email address', 404));
+    return next(new AppError('There is no user with that email address.', 404));
   }
 
-  // 2) Generate the rabndom reset token
+  // 2) Generate the random reset token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
@@ -152,7 +152,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: 'Your password reset toekn (valid for 10 minutes)',
+      subject: 'Your password reset token (valid for 10 minutes)',
       message
     });
 
@@ -183,7 +183,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() }
   });
-  // 2) If token has not expired and there is user,, set the new password
+  // 2) If token has not expired and there is user, set the new password
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
@@ -203,13 +203,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
   // 2) Check if POSTed current password is correct
-  if (!(await user.correctPassword(req.body.passwordCurrent, user.password)))
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError('Your current password is incorrect', 400));
-
+  }
   // 3) If so, update password
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
+  // User.findAndUpdate will NOT work as intended
 
   // 4) Log user in, send JWT
   createSendToken(user, 200, res);
