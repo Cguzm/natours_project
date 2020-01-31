@@ -82,9 +82,3 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     user: updateUser
   });
 });
-
-// Test
-exports.checkUserAuth = async (req, res, next) => {
-  if (req.session.user) return next();
-  return next(new AppError('Not authorized error', 400));
-};

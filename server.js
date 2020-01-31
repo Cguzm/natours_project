@@ -38,7 +38,11 @@ mongoose
 // .catch(() => console.log('ERROR'));
 
 // SERVER INITIALIZER
+const timeout = app.listen();
+timeout.setTimeout(500000);
+
 const port = process.env.PORT || 8000;
+
 const server = app.listen(port, () => {
   console.log(`Running on port ${port}`);
 });
