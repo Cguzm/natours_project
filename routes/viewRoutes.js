@@ -23,4 +23,5 @@ router.post(
   authController.protect,
   viewsController.updateUserData
 );
+
 module.exports = router;

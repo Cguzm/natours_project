@@ -1,4 +1,7 @@
 const multer = require('multer');
+const cloudinary = require('cloudinary');
+const Datauri = require('datauri');
+const path = require('path');
 const sharp = require('sharp');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
@@ -15,6 +18,8 @@ const factory = require('./handlerFactory');
 //   }
 // });
 
+const dUri = new Datauri();
+
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -29,6 +34,12 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter
+});
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 exports.uploadUserPhoto = upload.single('photo');
@@ -65,24 +76,39 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'This route is not for password updates. Please user /updatteMyPassword',
+        'This route is not for password updates. Please use /updateMyPassword',
         400
       )
     );
   }
+
+  const fileToString = dUri.format(
+    path.extname(req.file.filename).toString(),
+    req.file.buffer
+  );
+
   // 2) Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, 'name', 'email');
-  if (req.file) filteredBody.photo = req.file.filename;
+  if (req.file) filteredBody.photo = fileToString.content;
 
-  // 3) Update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true
-  });
+  cloudinary.uploader.upload(filteredBody.photo, async result => {
+    console.log(result.secure_url);
 
-  res.status(200).json({
-    status: 'success',
-    data: updatedUser
+    filteredBody.photo = result.secure_url;
+    // 3) Update user document
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      filteredBody,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    res.status(200).json({
+      status: 'success',
+      data: updatedUser
+    });
   });
 });
 

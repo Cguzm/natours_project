@@ -37,6 +37,7 @@ router.patch(
   userController.resizeUserPhoto,
   userController.updateMe
 );
+
 // Delete current user
 router.delete('/deleteMe', userController.deleteMe);
 
