@@ -1,7 +1,7 @@
 const express = require('express');
-const multer = require('multer');
 
 const router = express.Router();
+
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
 const {
@@ -14,6 +14,7 @@ const {
 
 // Registration and login
 router.post('/signup', authController.signup);
+
 router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 

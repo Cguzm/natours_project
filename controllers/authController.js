@@ -39,13 +39,14 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  console.log(req.body);
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: req.body.passwordChangedAt,
-    role: req.body.role
+    passwordConfirm: req.body.passwordConfirm
+    // passwordChangedAt: req.body.passwordChangedAt,
+    // role: req.body.role
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
@@ -61,6 +62,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   //     user: newUser
   //   }
   // });
+  next();
 });
 
 exports.login = catchAsync(async (req, res, next) => {

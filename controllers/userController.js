@@ -18,7 +18,7 @@ const factory = require('./handlerFactory');
 //   }
 // });
 
-const dUri = new Datauri();
+const dataUri = new Datauri();
 
 const multerStorage = multer.memoryStorage();
 
@@ -82,18 +82,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  const fileToString = dUri.format(
+  const imageFile = dataUri.format(
     path.extname(req.file.filename).toString(),
     req.file.buffer
   );
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, 'name', 'email');
-  if (req.file) filteredBody.photo = fileToString.content;
+  if (req.file) filteredBody.photo = imageFile.content;
 
   cloudinary.uploader.upload(filteredBody.photo, async result => {
-    console.log(result.secure_url);
-
     filteredBody.photo = result.secure_url;
     // 3) Update user document
     const updatedUser = await User.findByIdAndUpdate(
