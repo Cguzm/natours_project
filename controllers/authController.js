@@ -64,7 +64,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   res.cookie('jwt', token, cookieOptions);
   // Remove the password from the OP
   newUser.password = undefined;
-  res.redirect('/');
+  res.redirect('/me');
   next();
 });
 
