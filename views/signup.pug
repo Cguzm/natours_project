@@ -5,8 +5,8 @@ block content
      main.main
         .signup-form
             h2.heading-secondary.ma-bt-lg Create your account
-            //- form.form.form--signup(action='/signup', method='POST')
-            form.form.form--signup
+            //- form.form.form--signup
+            form.form.form--signup(action='/signup', method='POST') 
                 .form__group
                     label.form__label(for='name') Name
                     input#name.form__input(type='text', placeholder='Enter your name', name='name' required)

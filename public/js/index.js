@@ -3,12 +3,12 @@ import '@babel/polyfill';
 import { displayMap } from './mapbox';
 import { login, logout } from './login';
 import { updateSettings } from './updateSetting.js';
-import { signUpUser } from './signUpUser.js';
+// import { signUpUser } from './signUpUser.js';
 import { bookTour } from './stripe';
 
 // DOM elements
 const mapBox = document.getElementById('map');
-const signupForm = document.querySelector('.form--signup');
+// const signupForm = document.querySelector('.form--signup');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const userDataForm = document.querySelector('.form-user-data');
@@ -21,37 +21,20 @@ if (mapBox) {
   displayMap(locations);
 }
 
-// if (signupForm) {
-//   signupForm.addEventListener('submit', e => {
+// if (signupForm)
+//   signupUser.addEventListener('submit', e => {
 //     e.preventDefault();
 //     const form = new FormData();
-
 //     form.append('name', document.getElementById('name').value);
 //     form.append('email', document.getElementById('email').value);
 //     form.append('password', document.getElementById('password').value);
 //     form.append(
 //       'passwordConfirm',
-//       document.getElementById('password-confirm').value
+//       document.getElementById('passwordConfirm').value
 //     );
-//     console.log(form);
+
 //     signUpUser(form);
 //   });
-// }
-
-if (signupForm)
-  signupUser.addEventListener('submit', e => {
-    e.preventDefault();
-    const form = new FormData();
-    form.append('name', document.getElementById('name').value);
-    form.append('email', document.getElementById('email').value);
-    form.append('password', document.getElementById('password').value);
-    form.append(
-      'passwordConfirm',
-      document.getElementById('passwordConfirm').value
-    );
-
-    signUpUser(form);
-  });
 
 if (loginForm) {
   loginForm.addEventListener('submit', e => {

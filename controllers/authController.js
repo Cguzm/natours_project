@@ -12,7 +12,6 @@ const signToken = id => {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
-
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
@@ -39,7 +38,6 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  console.log(req.body);
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -52,17 +50,21 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}/me`;
   await new Email(newUser, url).sendWelcome();
 
-  createSendToken(newUser, 201, req, res);
-  // const token = signToken(newUser._id);
+  const token = signToken(newUser._id);
 
-  // res.status(201).json({
-  //   status: 'succes',
-  //   token,
-  //   data: {
-  //     user: newUser
-  //   }
-  // });
-  next();
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    // secure: true,
+    httpOnly: true,
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+  };
+
+  res.cookie('jwt', token, cookieOptions);
+  // Remove the password from the OP
+  newUser.password = undefined;
+  res.redirect('/me');
 });
 
 exports.login = catchAsync(async (req, res, next) => {
