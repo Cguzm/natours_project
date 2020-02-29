@@ -58,9 +58,13 @@ exports.getMyTours = catchAsync(async (req, res, next) => {
   // 1) Find all bookings
   const bookings = await Booking.find({ user: req.user.id });
 
-  // 2) Find tours with retune
+  // 2) Find tours with return
   const tourIds = bookings.map(el => el.tour);
   const tours = await Tour.find({ _id: { $in: tourIds } });
+  // if (tours.length === 0) return new AppError("", )
+  if (tours.length === 0) {
+    return next(new AppError('No tours were found!', 404));
+  }
 
   res.status(200).render('overview', {
     title: 'My tours',

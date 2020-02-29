@@ -64,7 +64,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   res.cookie('jwt', token, cookieOptions);
   // Remove the password from the OP
   newUser.password = undefined;
-  res.redirect('/me');
+  res.redirect('/');
   next();
 });
 
@@ -87,7 +87,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
+  res.cookie('jwt', '', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
   });
@@ -102,7 +102,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
+  } else if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
     token = req.cookies.jwt;
   }
 
